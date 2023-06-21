@@ -1,0 +1,18 @@
+################################
+# STEP 1 build executable binary
+################################
+
+FROM golang:1.20.5-alpine AS builder
+RUN apk update && apk add --no-cache git
+WORKDIR /app
+COPY go.mod ./
+RUN go mod download
+COPY *.go ./
+RUN go build -o /hello
+
+############################
+# STEP 2 build a small image
+############################
+FROM scratch
+COPY --from=builder /hello /hello
+ENTRYPOINT ["/hello"]
